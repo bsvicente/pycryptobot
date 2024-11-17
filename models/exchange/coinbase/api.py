@@ -130,7 +130,9 @@ class AuthAPI(AuthAPIBase):
         df = df[df.balance != "0.0000000000000000"]
 
         # return standard columns
-        df.drop(columns=["name", "default", "deleted_at", "created_at", "updated_at", "type", "ready"], inplace=True)
+        # df.drop(columns=["name", "default", "deleted_at", "created_at", "updated_at", "type", "ready"], inplace=True)
+        # Selects only the essential columns for analysis, discarding unnecessary ones
+        df = df[["uuid","currency","active","balance","hold"]]
         df.columns = ["id", "currency", "trading_enabled", "balance", "hold"]
         df["balance"] = pd.to_numeric(df["balance"])
         df["hold"] = pd.to_numeric(df["hold"])
