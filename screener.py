@@ -12,6 +12,7 @@ from importlib.metadata import version
 from controllers.PyCryptoBot import PyCryptoBot
 from models.helper.TelegramBotHelper import TelegramBotHelper as TGBot
 from models.exchange.binance import PublicAPI as BPublicAPI
+from models.config.coinbase_parser import parser as coinbaseParser
 from models.exchange.coinbase import AuthAPI as CBAuthAPI
 from models.exchange.coinbase_pro import PublicAPI as CPublicAPI
 from models.exchange.kucoin import PublicAPI as KPublicAPI
@@ -76,7 +77,9 @@ def load_configs():
                 exchanges_loaded.append(binance_app)
             elif ex == CryptoExchange.COINBASE:
                 coinbase_app = PyCryptoBot(exchange=ex)
-                coinbase_app.public_api = CBAuthAPI(bot_config[ex.value]["api_key"], bot_config[ex.value]["api_secret"], bot_config[ex.value]["api_url"])
+                coinbaseParser(coinbase_app, bot_config[ex.value])
+                # coinbase_app.public_api = CBAuthAPI(bot_config[ex.value]["api_key"], bot_config[ex.value]["api_secret"], bot_config[ex.value]["api_url"])
+                coinbase_app.public_api = CPublicAPI()
                 coinbase_app.scanner_quote_currencies = exchange_config.get("quote_currency", ["USDT"])
                 coinbase_app.granularity = Granularity(Granularity.convert_to_enum(int(exchange_config.get("granularity", "3600"))))
                 coinbase_app.adx_threshold = exchange_config.get("adx_threshold", 25)

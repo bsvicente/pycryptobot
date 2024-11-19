@@ -34,11 +34,11 @@ for exchange in config:
     for quote in config[ex.value]["quote_currency"]:
         if ex == Exchange.BINANCE:
             api = BPublicAPI(bot_config[ex.value]["api_url"])
-        elif ex == Exchange.COINBASE:
+        # elif ex == Exchange.COINBASE:
             # Read config from key file
-            coinbaseParser(app, bot_config[ex.value])
-            api = CBAuthAPI(bot_config[ex.value]["api_key"], bot_config[ex.value]["api_secret"], bot_config[ex.value]["api_url"])
-        elif ex == Exchange.COINBASEPRO:
+            # coinbaseParser(app, bot_config[ex.value])
+            # api = CBAuthAPI(bot_config[ex.value]["api_key"], bot_config[ex.value]["api_secret"], bot_config[ex.value]["api_url"])
+        elif ex == Exchange.COINBASEPRO or ex == Exchange.COINBASE:
             api = CPublicAPI()
         elif ex == Exchange.KUCOIN:
             api = KPublicAPI(bot_config[ex.value]["api_url"])
