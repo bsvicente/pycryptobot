@@ -6,6 +6,7 @@ import sys
 
 from .default_parser import is_currency_valid, default_config_parse, merge_config_and_args
 from models.exchange.Granularity import Granularity
+from utils.PyCryptoBot import validate_ec_private_key as _validate_ec_private_key
 
 
 def is_market_valid(market) -> bool:
@@ -67,7 +68,7 @@ def parser(app, coinbase_config, args={}):
                 try:
                     with open(app.api_key_file, "r") as f:
                         key = f.readline().strip()
-                        secret = f.readline().strip()
+                        secret = f.readline().replace('\\n', os.linesep).strip()
                     coinbase_config["api_key"] = key
                     coinbase_config["api_secret"] = secret
                 except Exception:
@@ -78,15 +79,14 @@ def parser(app, coinbase_config, args={}):
 
         if "api_key" in coinbase_config and "api_secret" in coinbase_config and "api_url" in coinbase_config:
             # validates the api key is syntactically correct
-            p = re.compile(r"^[A-z0-9]{16,16}$")
+            p = re.compile(r"^organizations/[0-9a-fA-F-]{36,36}/apiKeys/[0-9a-fA-F-]{36,36}$")
             if not p.match(coinbase_config["api_key"]):
                 raise TypeError("Coinbase API key is invalid")
 
             app.api_key = coinbase_config["api_key"]
 
             # validates the api secret is syntactically correct
-            p = re.compile(r"^[A-z0-9]{32,32}$")
-            if not p.match(coinbase_config["api_secret"]):
+            if _validate_ec_private_key(coinbase_config["api_secret"]):
                 raise TypeError("Coinbase API secret is invalid")
 
             app.api_secret = coinbase_config["api_secret"]

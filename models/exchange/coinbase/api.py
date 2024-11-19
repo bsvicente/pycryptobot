@@ -17,6 +17,8 @@ from threading import Thread
 from websocket import create_connection, WebSocketConnectionClosedException
 from models.exchange.Granularity import Granularity
 from views.PyCryptoBot import RichText
+from coinbase import jwt_generator
+from utils.PyCryptoBot import validate_ec_private_key as _validate_ec_private_key
 
 MARGIN_ADJUSTMENT = 0.0025
 DEFAULT_MAKER_FEE_RATE = 0.004
@@ -67,13 +69,12 @@ class AuthAPI(AuthAPIBase):
             api_url = api_url + "/"
 
         # validates the api key is syntactically correct
-        p = re.compile(r"^[a-zA-Z0-9]{16}$")
+        p = re.compile(r"^organizations/[0-9a-fA-F-]{36,36}/apiKeys/[0-9a-fA-F-]{36,36}$")
         if not p.match(api_key):
             self.handle_init_error("Coinbase API key is invalid", app=app)
 
         # validates the api secret is syntactically correct
-        p = re.compile(r"^[a-zA-Z0-9]{32}$")
-        if not p.match(api_secret):
+        if _validate_ec_private_key(api_secret):
             self.handle_init_error("Coinbase API secret is invalid", app=app)
 
         # app
@@ -93,22 +94,23 @@ class AuthAPI(AuthAPIBase):
 
     def __call__(self, request) -> Request:
         """Signs the request"""
+        
+        api_key = self._api_key
+        api_secret = self._api_secret
 
-        timestamp = str(int(time.time()))
-        body = (request.body or b"").decode()
-        url = request.path_url.split("?")[0]
-        message = f"{timestamp}{request.method}{url}{body}"
-        signature = hmac.new(self._api_secret.encode("utf-8"), message.encode("utf-8"), digestmod=hashlib.sha256).hexdigest()
+        request_method = request.method
+        request_path = request.path_url.split("?")[0]
 
+        jwt_uri = jwt_generator.format_jwt_uri(request_method, request_path)
+        jwt_token = jwt_generator.build_rest_jwt(jwt_uri, api_key, api_secret)
+        
         request.headers.update(
             {
-                "CB-ACCESS-SIGN": signature,
-                "CB-ACCESS-TIMESTAMP": timestamp,
-                "CB-ACCESS-KEY": self._api_key,
-                "Content-Type": "application/json",
+                "Authorization": f"Bearer {jwt_token}",
+                "Content-Type": "application/json"
             }
         )
-
+        
         return request
 
     # wallet:accounts:read
@@ -128,7 +130,9 @@ class AuthAPI(AuthAPIBase):
         df = df[df.balance != "0.0000000000000000"]
 
         # return standard columns
-        df.drop(columns=["name", "default", "deleted_at", "created_at", "updated_at", "type", "ready"], inplace=True)
+        # df.drop(columns=["name", "default", "deleted_at", "created_at", "updated_at", "type", "ready"], inplace=True)
+        # Selects only the essential columns for analysis, discarding unnecessary ones
+        df = df[["uuid","currency","active","balance","hold"]]
         df.columns = ["id", "currency", "trading_enabled", "balance", "hold"]
         df["balance"] = pd.to_numeric(df["balance"])
         df["hold"] = pd.to_numeric(df["hold"])

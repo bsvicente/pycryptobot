@@ -2,7 +2,8 @@
 
 import math
 from typing import Union
-
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 
 def truncate(f: Union[int, float], n: Union[int, float]) -> str:
     """
@@ -42,3 +43,18 @@ def compare(val1, val2, label="", precision=2):
             return f"{truncate(val1, precision)} = {truncate(val2, precision)}"
         else:
             return f"{label}: {truncate(val1, precision)} = {truncate(val2, precision)}"
+
+
+def validate_ec_private_key(key_pem):
+    try:
+        # Load the private key
+        private_key = serialization.load_pem_private_key(
+            key_pem.encode(),  # Convert to bytes if it's a string
+            password=None,
+            backend=default_backend()
+        )
+        # If no exception was raised, the key is valid
+        return False
+    except Exception as e:
+        # Handle the exception for invalid keys
+        raise ValueError (f"Invalid EC Private Key: {str(e)}")
