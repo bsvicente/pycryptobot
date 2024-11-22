@@ -197,7 +197,7 @@ class TelegramHandler:
             update.callback_query.data = "all"
             self.control.action_bot_response(update, "reload", "reload", context=context, status="active")
         elif callback_json is not None and callback_json["c"] == callbacktags.GRANULARITY[0]:
-            self.editor.granularity(update, callback_json["e"], context)
+            self.editor.get_granularity(update, callback_json["e"], context)
 
         # Restart Bots
         elif query.data == "restart":

@@ -17,8 +17,8 @@ from models.exchange.ExchangesEnum import Exchange
 GRANULARITY = Granularity(Granularity.ONE_HOUR)
 
 try:
-    with open("scanner.json", encoding='utf8') as json_file:
-        config = json.load(json_file)
+    with open("config.json", encoding='utf8') as json_file:
+        config = json.load(json_file)["scanner"]["exchange"]
 except IOError as err:
     print(err)
 

@@ -1395,7 +1395,7 @@ class PyCryptoBot(BotConfig):
                         if self.is_sim:
                             tradinggraphs.render_ema_and_macd(len(trading_dataCopy), "graphs/" + filename, True)
                         else:
-                            tradinggraphs.render_ema_and_macd(len(trading_data), "graphs/" + filename, True)
+                            tradinggraphs.render_ema_and_macd(len(self.trading_data), "graphs/" + filename, True)
 
                     if self.exitaftersell:
                         RichText.notify("Exit after sell! (\"exitaftersell\" is enabled)", self, "warning")

@@ -77,7 +77,7 @@ class TelegramActions:
                     market,
                     self.helper.data["opentrades"][market]["exchange"],
                     "",
-                    "telegram-open",
+                    "telegram",
                 )
             sleep(10)
         self.helper.send_telegram_message(update, "<i>Markets have been started</i>", context=context)
@@ -186,7 +186,7 @@ class TelegramActions:
         query = update.callback_query
         self.helper.logger.info("called show_config_response - %s", query.data)
 
-        if query.data == "scanner":
+        if query.data == "scanner" or query.data == "screener":
             pbot = self.helper.config[query.data]
         else:
             pbot = self.helper.config[query.data]["config"]

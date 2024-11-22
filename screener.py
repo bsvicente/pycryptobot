@@ -46,8 +46,8 @@ def volatility_calculator(bollinger_band_upper, bollinger_band_lower, keltner_up
 def load_configs():
     exchanges_loaded = []
     try:
-        with open("screener.json", encoding="utf8") as json_file:
-            config = json.load(json_file)
+        with open("config.json", encoding="utf8") as json_file:
+            config = json.load(json_file)["screener"]
     except IOError as err:
         raise (err)
 

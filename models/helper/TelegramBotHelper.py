@@ -19,7 +19,7 @@ class TelegramBotHelper:
         self.botpath = os.path.join(self.app.telegramdatafolder, self.botfolder, self.market)
         self.filename = self.market + ".json"
 
-        if not self.app.is_sim and self.app.telegrambotcontrol and not scanner:
+        if not self.app.is_sim and self.app.telegrambotcontrol and not scanner and self.app.startmethod != "standard":
             if not os.path.exists(self.botfolder):
                 os.makedirs(self.botfolder)
 
