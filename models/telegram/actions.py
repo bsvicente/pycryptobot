@@ -294,18 +294,19 @@ class TelegramActions:
         """Start market scanner/screener"""
         # Check whether using the scanner or the screener - use correct config file etc
         if use_default_scanner is True:
-            scanner_config_file = "scanner.json"
+            scanner_config_file = "config.json"
             scanner_script_file = "scanner.py"
         elif use_default_scanner is False:
-            scanner_config_file = "screener.json"
+            scanner_config_file = "config.json"
             scanner_script_file = "screener.py"
 
         self.helper.logger.info("called start_market_scan - %s", scanner_script_file)
-
+        _n = scanner_script_file.split(".")[0]
+        
         try:
             self.helper.load_config()
             with open(f"{scanner_config_file}", encoding="utf8") as json_file:
-                config = json.load(json_file)
+                config = json.load(json_file)[_n]["exchange"]
         except IOError as err:
             self.helper.send_telegram_message(
                 update,

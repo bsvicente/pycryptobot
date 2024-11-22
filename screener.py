@@ -47,7 +47,7 @@ def load_configs():
     exchanges_loaded = []
     try:
         with open("config.json", encoding="utf8") as json_file:
-            config = json.load(json_file)["screener"]
+            config = json.load(json_file)["screener"]["exchange"]
     except IOError as err:
         raise (err)
 
